@@ -32,3 +32,4 @@ set ttyfast                 " Speed up scrolling in Vim
 " language package)
 " " set noswapfile            " disable creating swap file
 " " set backupdir=~/.cache/vim " Directory to store backup files.
+set hidden
