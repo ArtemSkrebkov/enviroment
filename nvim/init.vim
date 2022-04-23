@@ -9,6 +9,7 @@ call plug#begin()
     Plug 'scrooloose/syntastic'
     Plug 'mattn/webapi-vim'
     Plug 'tpope/vim-commentary'
+    Plug 'tpope/vim-obsession'
 call plug#end()
 syntax enable
 filetype plugin indent on
