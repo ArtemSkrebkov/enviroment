@@ -22,6 +22,12 @@ call plug#begin()
     " For vsnip users.
     Plug 'hrsh7th/cmp-vsnip'
     Plug 'hrsh7th/vim-vsnip'
+    " telescope
+    Plug 'nvim-lua/plenary.nvim'
+    Plug 'nvim-telescope/telescope.nvim'
+    Plug 'nvim-telescope/telescope-fzy-native.nvim'
+    " treesitter
+    Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 call plug#end()
 syntax enable
 filetype plugin indent on
@@ -34,6 +40,12 @@ let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
+
+" telescope setup
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 
 " rust.vim
 let g:rustfmt_autosave = 1
@@ -69,6 +81,34 @@ set ttyfast                 " Speed up scrolling in Vim
 set hidden
 " LSP setup
 set completeopt=menu,menuone,noselect
+
+" treesitter setup
+lua << EOF
+    require'nvim-treesitter.configs'.setup {
+      -- A list of parser names, or "all"
+      ensure_installed = { "c", "cpp", "rust" },
+
+      -- Install parsers synchronously (only applied to `ensure_installed`)
+      sync_install = false,
+
+      highlight = {
+        -- `false` will disable the whole extension
+        enable = true,
+
+        -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
+        -- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
+        -- the name of the parser)
+        -- list of language that will be disabled
+        -- disable = { "c", "rust" },
+
+        -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+        -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+        -- Using this option may slow down your editor, and you may see some duplicate highlights.
+        -- Instead of true it can also be a list of languages
+        additional_vim_regex_highlighting = false,
+      },
+    }
+EOF
 
 lua <<EOF
   -- Setup nvim-cmp.
@@ -175,4 +215,22 @@ lua <<EOF
     on_attach = on_attach,
     cmd = {"clangd-12"}
   }
+    require'lspconfig'.rust_analyzer.setup({
+        on_attach=on_attach,
+        filetypes={"rust"},
+        settings = {
+            ["rust-analyzer"] = {
+                assist = {
+                    importGranularity = "module",
+                    importPrefix = "self",
+                },
+                cargo = {
+                    loadOutDirsFromCheck = true
+                },
+                procMacro = {
+                    enable = true
+                },
+            }
+        }
+    })
 EOF
