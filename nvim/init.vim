@@ -11,6 +11,7 @@ call plug#begin()
     Plug 'tpope/vim-commentary'
     Plug 'tpope/vim-obsession'
     Plug 'rhysd/vim-clang-format'
+    Plug 'skywind3000/asyncrun.vim'
     " autocompletion
     Plug 'neovim/nvim-lspconfig'
     Plug 'hrsh7th/cmp-nvim-lsp'
@@ -46,7 +47,6 @@ nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
-
 " rust.vim
 let g:rustfmt_autosave = 1
 " gruvbox
@@ -82,6 +82,19 @@ set hidden
 " LSP setup
 set completeopt=menu,menuone,noselect
 
+" python
+if exists(':AsyncRun')
+  nnoremap <buffer><silent> <F9> :<C-U>AsyncRun python3 -u "%"<CR>
+endif
+
+" Do not wrap Python source code.
+set nowrap
+set sidescroll=5
+set sidescrolloff=2
+set colorcolumn=100
+
+" For delimitMate
+let b:delimitMate_matchpairs = "(:),[:],{:}"
 " treesitter setup
 lua << EOF
     require'nvim-treesitter.configs'.setup {
@@ -233,4 +246,5 @@ lua <<EOF
             }
         }
     })
+    require'lspconfig'.pylsp.setup{}
 EOF
