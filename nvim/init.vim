@@ -12,6 +12,7 @@ call plug#begin()
     Plug 'tpope/vim-obsession'
     Plug 'rhysd/vim-clang-format'
     Plug 'skywind3000/asyncrun.vim'
+    Plug 'rhysd/vim-llvm'
     " autocompletion
     Plug 'neovim/nvim-lspconfig'
     Plug 'hrsh7th/cmp-nvim-lsp'
@@ -226,7 +227,7 @@ lua <<EOF
   -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
   require'lspconfig'.clangd.setup{ 
     on_attach = on_attach,
-    cmd = {"clangd-12"}
+    cmd = {"clangd"}
   }
     require'lspconfig'.rust_analyzer.setup({
         on_attach=on_attach,
