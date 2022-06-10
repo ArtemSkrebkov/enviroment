@@ -6,7 +6,6 @@ call plug#begin()
     Plug 'tpope/vim-fugitive'
     Plug 'morhetz/gruvbox'
     Plug 'rust-lang/rust.vim'
-    Plug 'scrooloose/syntastic'
     Plug 'mattn/webapi-vim'
     Plug 'tpope/vim-commentary'
     Plug 'tpope/vim-obsession'
@@ -33,15 +32,6 @@ call plug#begin()
 call plug#end()
 syntax enable
 filetype plugin indent on
-"syntastic settings
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
 
 " telescope setup
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
