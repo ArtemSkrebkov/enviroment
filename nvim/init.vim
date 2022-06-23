@@ -12,6 +12,8 @@ call plug#begin()
     Plug 'rhysd/vim-clang-format'
     Plug 'skywind3000/asyncrun.vim'
     Plug 'rhysd/vim-llvm'
+    Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }
+    Plug 'kamykn/spelunker.vim'
     " autocompletion
     Plug 'neovim/nvim-lspconfig'
     Plug 'hrsh7th/cmp-nvim-lsp'
@@ -73,17 +75,16 @@ set hidden
 " LSP setup
 set completeopt=menu,menuone,noselect
 
-" python
-if exists(':AsyncRun')
-  nnoremap <buffer><silent> <F9> :<C-U>AsyncRun python3 -u "%"<CR>
-endif
-
-" Do not wrap Python source code.
-set nowrap
-set sidescroll=5
-set sidescrolloff=2
-set colorcolumn=100
-
+" cpp
+" automatically open quickfix window when AsyncRun command is executed
+" set the quickfix window 6 lines height.
+let g:asyncrun_open = 6
+" ring the bell to notify you job finished
+let g:asyncrun_bell = 1
+" F10 to toggle quickfix window
+nnoremap <F10> :call asyncrun#quickfix_toggle(6)<cr>
+nnoremap <silent> <F9> :AsyncRun clang++ -Wall -Wextra -O2 "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
+nnoremap <silent> <F7> :AsyncRun -cwd=<root> ninja <cr>
 " For delimitMate
 let b:delimitMate_matchpairs = "(:),[:],{:}"
 " treesitter setup
@@ -217,7 +218,7 @@ lua <<EOF
   -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
   require'lspconfig'.clangd.setup{ 
     on_attach = on_attach,
-    cmd = {"clangd"}
+    cmd = {"clangd", "--clang-tidy"}
   }
     require'lspconfig'.rust_analyzer.setup({
         on_attach=on_attach,
