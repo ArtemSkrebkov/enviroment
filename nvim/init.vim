@@ -244,6 +244,9 @@ lua <<EOF
                 procMacro = {
                     enable = true
                 },
+                checkOnSave = {
+                    command = "clippy"
+                },
             }
         }
     })
