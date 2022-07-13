@@ -14,6 +14,7 @@ call plug#begin()
     Plug 'rhysd/vim-llvm'
     Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }
     Plug 'kamykn/spelunker.vim'
+    Plug 'dbeniamine/cheat.sh-vim'
     " autocompletion
     Plug 'neovim/nvim-lspconfig'
     Plug 'hrsh7th/cmp-nvim-lsp'
