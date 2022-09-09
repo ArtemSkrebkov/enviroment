@@ -15,6 +15,7 @@ call plug#begin()
     Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }
     Plug 'kamykn/spelunker.vim'
     Plug 'dbeniamine/cheat.sh-vim'
+    Plug 'puremourning/vimspector'
     " autocompletion
     Plug 'neovim/nvim-lspconfig'
     Plug 'hrsh7th/cmp-nvim-lsp'
@@ -84,7 +85,8 @@ if &modified && !empty(findfile('.clang-format', expand('%:p:h') . ';'))
 endif
 endfunction
 
-autocmd BufWritePre *.h,*.hpp,*.c,*.cpp,*.vert,*.frag :call FormatBuffer()
+" FIXME: freezes nvim
+" autocmd BufWritePre *.h,*.hpp,*.c,*.cpp,*.vert,*.frag :call FormatBuffer()
 " cpp
 " automatically open quickfix window when AsyncRun command is executed
 " set the quickfix window 6 lines height.
@@ -92,11 +94,13 @@ let g:asyncrun_open = 6
 " ring the bell to notify you job finished
 let g:asyncrun_bell = 1
 " F10 to toggle quickfix window
-nnoremap <F10> :call asyncrun#quickfix_toggle(6)<cr>
-nnoremap <silent> <F9> :AsyncRun clang++ -Wall -Wextra -O2 "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
-nnoremap <silent> <F7> :AsyncRun -cwd=<root> ninja <cr>
 " For delimitMate
 let b:delimitMate_matchpairs = "(:),[:],{:}"
+" vimspector
+let g:vimspector_enable_mappings = 'HUMAN'
+
+syntax enable
+filetype plugin indent on
 " treesitter setup
 lua << EOF
     require'nvim-treesitter.configs'.setup {
