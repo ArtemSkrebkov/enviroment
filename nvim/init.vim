@@ -33,6 +33,15 @@ call plug#begin()
     Plug 'nvim-telescope/telescope-fzy-native.nvim'
     " treesitter
     Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+    " debugging
+    Plug 'mfussenegger/nvim-dap'
+    Plug 'nvim-telescope/telescope-dap.nvim'
+    Plug 'mfussenegger/nvim-dap-python'
+    Plug 'theHamsta/nvim-dap-virtual-text'
+    Plug 'rcarriga/nvim-dap-ui'
+    Plug 'Pocco81/DAPInstall.nvim'
+    " rust-tools
+    Plug 'simrat39/rust-tools.nvim'
 call plug#end()
 syntax enable
 filetype plugin indent on
@@ -203,9 +212,9 @@ lua <<EOF
       local opts = { noremap=true, silent=true }
 
       -- See `:help vim.lsp.*` for documentation on any of the below functions
-      buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-      buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-      buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+      buf_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+      buf_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
+      buf_set_keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
       buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
       buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
       buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
@@ -234,26 +243,79 @@ lua <<EOF
     on_attach = on_attach,
     cmd = {"clangd", "--clang-tidy"}
   }
-    require'lspconfig'.rust_analyzer.setup({
-        on_attach=on_attach,
-        filetypes={"rust"},
-        settings = {
-            ["rust-analyzer"] = {
-                assist = {
-                    importGranularity = "module",
-                    importPrefix = "self",
-                },
-                cargo = {
-                    loadOutDirsFromCheck = true
-                },
-                procMacro = {
-                    enable = true
-                },
-                checkOnSave = {
-                    command = "clippy"
-                },
-            }
-        }
+  require'lspconfig'.pylsp.setup{}
+EOF
+
+lua <<EOF
+
+local rt = require("rust-tools")
+
+ rt.setup({
     })
-    require'lspconfig'.pylsp.setup{}
+
+local extension_path = '/home/artemy/workspace/repos/enviroment/nvim/extensions/codelldb-x86_64-linux/extension/'
+local codelldb_path = extension_path .. 'adapter/codelldb'
+local liblldb_path = extension_path .. 'lldb/lib/liblldb.so'
+local opts = {
+  server = {
+    on_attach = function(_, bufnr)
+      -- Hover actions
+      vim.keymap.set("n", "<Leader><F5>", rt.hover_actions.hover_actions, { buffer = bufnr })
+      -- Code action groups
+      vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
+    end,
+  },
+  -- debugging stuff
+  --dap = {
+  --  adapter = {
+  --    type = "executable",
+  --    command = "codelldb",
+  --    name = "rt_lldb",
+  --  },
+  --},
+  dap = {
+    adapter = require('rust-tools.dap').get_codelldb_adapter(
+      codelldb_path, liblldb_path)
+  }
+}
+
+require('rust-tools').setup(opts)
+EOF
+
+lua <<EOF
+    local function set_keymap(...) vim.api.nvim_set_keymap(...) end
+
+    local opts = { noremap=true, silent=true }
+    set_keymap("n", "<F2>", ":lua require('dapui').toggle()<CR>", opts)
+
+    set_keymap("n", "<F5>", ":lua require('dap').continue()<CR>", opts)
+    set_keymap("n", "<F3>", ":lua require('dap').terminate()<CR>", opts)
+
+    set_keymap("n", "<F9>", ":lua require('dap').toggle_breakpoint()<CR>", opts)
+
+    set_keymap("n", "<F10>", ":lua require('dap').step_over()<CR>", opts)
+    set_keymap("n", "<F11>", ":lua require('dap').step_into()<CR>", opts)
+    set_keymap("n", "<F12>", ":lua require('dap').step_out()<CR>", opts)
+
+    set_keymap("n", "<Leader>dsc", ":lua require('dap').continue()<CR>", opts)
+    set_keymap("n", "<Leader>dsv", ":lua require('dap').step_over()<CR>", opts)
+    set_keymap("n", "<Leader>dsi", ":lua require('dap').step_into()<CR>", opts)
+    set_keymap("n", "<Leader>dso", ":lua require('dap').step_out()<CR>", opts)
+
+    set_keymap("n", "<Leader>dhh", ":lua require('dap.ui.variables').hover()<CR>", opts)
+    set_keymap("v", "<Leader>dhv", ":lua require('dap.ui.variables').visual_hover()<CR>", opts)
+
+    set_keymap("n", "<Leader>duh", ":lua require('dap.ui.widgets').hover()<CR>", opts)
+    set_keymap("n", "<Leader>duf", ":lua local widgets=require('dap.ui.widgets');widgets.centered_float(widgets.scopes)<CR>", opts)
+
+    set_keymap("n", "<Leader>dro", ":lua require('dap').repl.open()<CR>", opts)
+    set_keymap("n", "<Leader>drl", ":lua require('dap').repl.run_last()<CR>", opts)
+
+    set_keymap("n", "<Leader>dbc", ":lua require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>", opts)
+    set_keymap("n", "<Leader>dbm", ":lua require('dap').set_breakpoint({ nil, nil, vim.fn.input('Log point message: ') })<CR>", opts)
+    set_keymap("n", "<Leader>dtb", ":lua require('dap').toggle_breakpoint()<CR>", opts)
+
+    set_keymap("n", "<Leader>dc", ":lua require('dap.ui.variables').scopes()<CR>", opts)
+    set_keymap("n", "<Leader>di", ":lua require('dapui').toggle()<CR>", opts)
+
 EOF
