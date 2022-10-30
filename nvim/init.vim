@@ -15,7 +15,7 @@ call plug#begin()
     Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }
     Plug 'kamykn/spelunker.vim'
     Plug 'dbeniamine/cheat.sh-vim'
-    Plug 'puremourning/vimspector'
+    " Plug 'puremourning/vimspector'
     " autocompletion
     Plug 'neovim/nvim-lspconfig'
     Plug 'hrsh7th/cmp-nvim-lsp'
@@ -106,7 +106,7 @@ let g:asyncrun_bell = 1
 " For delimitMate
 let b:delimitMate_matchpairs = "(:),[:],{:}"
 " vimspector
-let g:vimspector_enable_mappings = 'HUMAN'
+" let g:vimspector_enable_mappings = 'HUMAN'
 
 syntax enable
 filetype plugin indent on
@@ -263,16 +263,41 @@ local opts = {
       vim.keymap.set("n", "<Leader><F5>", rt.hover_actions.hover_actions, { buffer = bufnr })
       -- Code action groups
       vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
+
+      local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+      local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
+
+      --Enable completion triggered by <c-x><c-o>
+      buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
+
+      -- Mappings.
+      local opts = { noremap=true, silent=true }
+
+      -- See `:help vim.lsp.*` for documentation on any of the below functions
+      buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+      buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+      buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+      buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+      buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+      buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+      buf_set_keymap('n', '<space>r', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+      -- buf_set_keymap('n', '<space>a', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+      buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+      buf_set_keymap('n', '<space>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
+      buf_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
+      buf_set_keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
+      buf_set_keymap('n', '<space>q', '<cmd>lua vim.diagnostic.set_loclist()<CR>', opts)
+      buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+
+      -- Get signatures (and _only_ signatures) when in argument lists.
+      require "lsp_signature".on_attach({
+        doc_lines = 0,
+        handler_opts = {
+          border = "none"
+        },
+      })
     end,
   },
-  -- debugging stuff
-  --dap = {
-  --  adapter = {
-  --    type = "executable",
-  --    command = "codelldb",
-  --    name = "rt_lldb",
-  --  },
-  --},
   dap = {
     adapter = require('rust-tools.dap').get_codelldb_adapter(
       codelldb_path, liblldb_path)
@@ -280,6 +305,7 @@ local opts = {
 }
 
 require('rust-tools').setup(opts)
+require("dapui").setup()
 EOF
 
 lua <<EOF
