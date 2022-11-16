@@ -1,5 +1,5 @@
-sudo apt install clang-12 rust-all cmake git tmux neovim zsh curl
-sh -c "$(wget https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
+sudo apt install clang-12 cmake git tmux neovim zsh curl
+sh -c "$(wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
 # set zsh default-terminal for tmux and terminal
 # create folders for work
 cd ~

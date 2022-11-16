@@ -42,10 +42,16 @@ call plug#begin()
     Plug 'Pocco81/DAPInstall.nvim'
     " rust-tools
     Plug 'simrat39/rust-tools.nvim'
+    " try to enable copy-paste
+    Plug 'ojroques/nvim-osc52', {'branch': 'main'}
+    Plug 'aklt/plantuml-syntax'
+    Plug 'tyru/open-browser.vim'
+    Plug 'weirongxu/plantuml-previewer.vim'
 call plug#end()
 syntax enable
 filetype plugin indent on
-
+" source init.vim
+nnoremap <silent> <Leader><Leader> :source $MYVIMRC<cr>
 " telescope setup
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
@@ -74,7 +80,7 @@ set cc=120                  " set an 120 column border for good coding style
 filetype plugin indent on   "allow auto-indenting depending on file type
 syntax on                   " syntax highlighting
 set mouse=a                 " enable mouse click
-set clipboard=unnamedplus   " using system clipboard
+set clipboard+=unnamedplus   " using system clipboard
 filetype plugin on
 set cursorline              " highlight current cursorline
 set ttyfast                 " Speed up scrolling in Vim
@@ -237,7 +243,7 @@ lua <<EOF
   end
 
   -- Setup lspconfig.
-  local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+  local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
   -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
   require'lspconfig'.clangd.setup{ 
     on_attach = on_attach,
@@ -253,9 +259,11 @@ local rt = require("rust-tools")
  rt.setup({
     })
 
-local extension_path = '/home/artemy/workspace/repos/enviroment/nvim/extensions/codelldb-x86_64-linux/extension/'
+local extension_path = '/home/askrebko/workspace/repos/enviroment/nvim/extensions/codelldb-x86_64-linux/extension/'
 local codelldb_path = extension_path .. 'adapter/codelldb'
 local liblldb_path = extension_path .. 'lldb/lib/liblldb.so'
+
+local cpptools_path = '/home/askrebko/workspace/repos/enviroment/nvim/extensions/cpptools/extension/debugAdapters/bin/OpenDebugAD7'
 local opts = {
   server = {
     on_attach = function(_, bufnr)
@@ -304,7 +312,62 @@ local opts = {
   }
 }
 
-require('rust-tools').setup(opts)
+-- disable rust tools while debugging cpp config
+-- require('rust-tools').setup(opts)
+
+local dap = require('dap')
+-- dap.adapters.codelldb = {
+--  type = 'server',
+--  port = "${port}",
+--  executable = {
+    -- CHANGE THIS to your path!
+--    command = codelldb_path,
+--    args = {"--port", "${port}"},
+
+    -- On windows you may have to uncomment this:
+    -- detached = false,
+--  }
+--}
+--dap.configurations.cpp = {
+--  {
+--    name = "Launch file",
+--    type = "codelldb",
+--    request = "launch",
+--    program = '${workspaceFolder}/bin/intel64/Debug/vpuxFuncTests',
+--    cwd = '${workspaceFolder}',
+--    stopOnEntry = true,
+--    args = {"--gtest_filter=*MemoryLSTM*"},
+--  },
+--}
+dap.adapters.cppdbg = {
+  id = 'cppdbg',
+  type = 'executable',
+  command = cpptools_path,
+}
+dap.configurations.cpp = {
+  {
+    name = "Launch file",
+    type = "cppdbg",
+    request = "launch",
+    miDebuggerPath = '/usr/bin/gdb',
+    program = '${workspaceFolder}/bin/intel64/RelWithDebInfo/vpuxFuncTests',
+    cwd = '${workspaceFolder}',
+    stopAtEntry = true,
+    args = {'"--gtest_filter=*MemoryLSTM*"'},
+  },
+--  {
+--    name = 'Attach to gdbserver :1234',
+--    type = 'cppdbg',
+--    request = 'launch',
+--    MIMode = 'gdb',
+--    miDebuggerServerAddress = 'localhost:1234',
+--    miDebuggerPath = '/usr/bin/gdb',
+--    cwd = '${workspaceFolder}',
+--    program = function()
+--      return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+--    end,
+--  },
+}
 require("dapui").setup()
 EOF
 
@@ -328,6 +391,9 @@ lua <<EOF
     set_keymap("n", "<Leader>dsi", ":lua require('dap').step_into()<CR>", opts)
     set_keymap("n", "<Leader>dso", ":lua require('dap').step_out()<CR>", opts)
 
+    set_keymap("n", "<Leader>dk", ":lua require('dap').up()<CR>", opts)
+    set_keymap("n", "<Leader>dj", ":lua require('dap').down()<CR>", opts)
+
     set_keymap("n", "<Leader>dhh", ":lua require('dap.ui.variables').hover()<CR>", opts)
     set_keymap("v", "<Leader>dhv", ":lua require('dap.ui.variables').visual_hover()<CR>", opts)
 
@@ -345,3 +411,4 @@ lua <<EOF
     set_keymap("n", "<Leader>di", ":lua require('dapui').toggle()<CR>", opts)
 
 EOF
+
