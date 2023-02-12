@@ -57,6 +57,13 @@ nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+
+" vim rc edit remap
+" Edit vimr configuration file
+nnoremap <Leader>ve :e $MYVIMRC<CR>
+" " Reload vimr configuration file
+nnoremap <Leader>vr :source $MYVIMRC<CR>
+
 " rust.vim
 let g:rustfmt_autosave = 1
 " gruvbox
@@ -247,7 +254,7 @@ lua <<EOF
   -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
   require'lspconfig'.clangd.setup{ 
     on_attach = on_attach,
-    cmd = {"clangd", "--clang-tidy"}
+    cmd = {"clangd-12", "--background-index", "--clang-tidy"}
   }
   require'lspconfig'.pylsp.setup{}
 EOF
@@ -350,11 +357,22 @@ dap.configurations.cpp = {
     type = "cppdbg",
     request = "launch",
     miDebuggerPath = '/usr/bin/gdb',
-    program = '${workspaceFolder}/bin/intel64/RelWithDebInfo/vpuxFuncTests',
+    program = '${workspaceFolder}/bin/intel64/Debug/benchmark_app',
     cwd = '${workspaceFolder}',
     stopAtEntry = true,
-    args = {'"--gtest_filter=*MemoryLSTM*"'},
+    args = {' " -m /home/askrebko/workspace/tmp/conformance_dump/converted_models/public/bert-base-ner/FP16/bert-base-ner.xml -d VPUX.3720 -shape "[1,?]" -data_shape "[1,64]" " '}
   },
+-- dap.configurations.cpp = {
+--   {
+--    name = "Launch file",
+--    type = "cppdbg",
+--    request = "launch",
+--    miDebuggerPath = '/usr/bin/gdb',
+--    program = '${workspaceFolder}/bin/intel64/RelWithDebInfo/vpuxFuncTests',
+--    cwd = '${workspaceFolder}',
+--    stopAtEntry = true,
+--    args = {'"--gtest_filter=*MemoryLSTM*"'},
+--  },
 --  {
 --    name = 'Attach to gdbserver :1234',
 --    type = 'cppdbg',
