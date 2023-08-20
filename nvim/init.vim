@@ -1,59 +1,7 @@
 let mapleader = "\<Space>"
 
-call plug#begin()
-    Plug 'scrooloose/nerdtree'
-    Plug 'christoomey/vim-tmux-navigator'
-    Plug 'tpope/vim-fugitive'
-    Plug 'morhetz/gruvbox'
-    Plug 'rust-lang/rust.vim'
-    Plug 'mattn/webapi-vim'
-    Plug 'tpope/vim-commentary'
-    Plug 'tpope/vim-obsession'
-    Plug 'rhysd/vim-clang-format'
-    Plug 'skywind3000/asyncrun.vim'
-    Plug 'rhysd/vim-llvm'
-    Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }
-    Plug 'kamykn/spelunker.vim'
-    Plug 'dbeniamine/cheat.sh-vim'
-    " Plug 'puremourning/vimspector'
-    " autocompletion
-    Plug 'neovim/nvim-lspconfig'
-    Plug 'hrsh7th/cmp-nvim-lsp'
-    Plug 'hrsh7th/cmp-buffer'
-    Plug 'hrsh7th/cmp-path'
-    Plug 'hrsh7th/cmp-cmdline'
-    Plug 'hrsh7th/nvim-cmp'
-    Plug 'ray-x/lsp_signature.nvim'
-    " For vsnip users.
-    Plug 'hrsh7th/cmp-vsnip'
-    Plug 'hrsh7th/vim-vsnip'
-    " telescope
-    Plug 'nvim-lua/plenary.nvim'
-    Plug 'nvim-telescope/telescope.nvim'
-    Plug 'nvim-telescope/telescope-fzy-native.nvim'
-    " treesitter
-    Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-    " debugging
-    Plug 'mfussenegger/nvim-dap'
-    Plug 'nvim-telescope/telescope-dap.nvim'
-    Plug 'mfussenegger/nvim-dap-python'
-    Plug 'theHamsta/nvim-dap-virtual-text'
-    Plug 'rcarriga/nvim-dap-ui'
-    Plug 'Pocco81/DAPInstall.nvim'
-    " rust-tools
-    Plug 'simrat39/rust-tools.nvim'
-    " try to enable copy-paste
-    Plug 'ojroques/nvim-osc52', {'branch': 'main'}
-    Plug 'aklt/plantuml-syntax'
-    Plug 'tyru/open-browser.vim'
-    Plug 'weirongxu/plantuml-previewer.vim'
-    Plug 'ThePrimeagen/git-worktree.nvim'
-    Plug 'vim-airline/vim-airline'
-    Plug 'ThePrimeagen/harpoon'
+lua require('init')
 
-    Plug 'kyazdani42/nvim-web-devicons'
-    Plug 'pwntester/octo.nvim'
-call plug#end()
 syntax enable
 filetype plugin indent on
 " source init.vim
@@ -64,7 +12,6 @@ nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 
-" osc52 remap
 " vim rc edit remap
 " Edit vimr configuration file
 nnoremap <Leader>ve :e $MYVIMRC<CR>
@@ -133,12 +80,6 @@ set mouse=
 syntax enable
 filetype plugin indent on
 
-" osc52 remap
-lua << EOF
-    vim.keymap.set('n', '<leader>c', require('osc52').copy_operator, {expr = true})
-    vim.keymap.set('n', '<leader>cc', '<leader>c_', {remap = true})
-    vim.keymap.set('x', '<leader>c', require('osc52').copy_visual)
-EOF
 
 " treesitter setup
 lua << EOF
@@ -293,11 +234,6 @@ local rt = require("rust-tools")
  rt.setup({
     })
 
-local extension_path = '/home/askrebko/workspace/repos/enviroment/nvim/extensions/codelldb-x86_64-linux/extension/'
-local codelldb_path = extension_path .. 'adapter/codelldb'
-local liblldb_path = extension_path .. 'lldb/lib/liblldb.so'
-
-local cpptools_path = '/home/askrebko/workspace/repos/enviroment/nvim/extensions/cpptools/extension/debugAdapters/bin/OpenDebugAD7'
 local opts = {
   server = {
     on_attach = function(_, bufnr)
@@ -339,132 +275,8 @@ local opts = {
         },
       })
     end,
-  },
-  dap = {
-    adapter = require('rust-tools.dap').get_codelldb_adapter(
-      codelldb_path, liblldb_path)
   }
 }
-
--- disable rust tools while debugging cpp config
--- require('rust-tools').setup(opts)
-
-local dap = require('dap')
--- dap.adapters.codelldb = {
---  type = 'server',
---  port = "${port}",
---  executable = {
-    -- CHANGE THIS to your path!
---    command = codelldb_path,
---    args = {"--port", "${port}"},
-
-    -- On windows you may have to uncomment this:
-    -- detached = false,
---  }
---}
---dap.configurations.cpp = {
---  {
---    name = "Launch file",
---    type = "codelldb",
---    request = "launch",
---    program = '${workspaceFolder}/bin/intel64/Debug/vpuxFuncTests',
---    cwd = '${workspaceFolder}',
---    stopOnEntry = true,
---    args = {"--gtest_filter=*MemoryLSTM*"},
---  },
---}
-dap.adapters.cppdbg = {
-  id = 'cppdbg',
-  type = 'executable',
-  command = cpptools_path,
-}
-dap.configurations.cpp = {
-  {
-    name = "Launch file",
-    type = "cppdbg",
-    request = "launch",
-    miDebuggerPath = '/usr/bin/gdb',
-    program = '${workspaceFolder}/bin/intel64/Debug/vpux-opt',
-    cwd = '${workspaceFolder}',
-    stopAtEntry = true,
-    args = {'--resolve-ranked-shaped-type-result-dims net-import-ie.mlir --mlir-print-debuginfo -o net-out.mlir'}
-  },
---dap.configurations.cpp = {
---  {
---    name = "Launch file",
---    type = "cppdbg",
---    request = "launch",
---    miDebuggerPath = '/usr/bin/gdb',
---    program = '${workspaceFolder}/bin/intel64/Debug/benchmark_app',
---    cwd = '${workspaceFolder}',
---    stopAtEntry = true,
---    args = {' " -m /home/askrebko/workspace/tmp/conformance_dump/converted_models/public/bert-base-ner/FP16/bert-base-ner.xml -d VPUX.3720 -shape "[1,?]" -data_shape "[1,64]" " '}
---  },
--- dap.configurations.cpp = {
---   {
---    name = "Launch file",
---    type = "cppdbg",
---    request = "launch",
---    miDebuggerPath = '/usr/bin/gdb',
---    program = '${workspaceFolder}/bin/intel64/RelWithDebInfo/vpuxFuncTests',
---    cwd = '${workspaceFolder}',
---    stopAtEntry = true,
---    args = {'"--gtest_filter=*MemoryLSTM*"'},
---  },
---  {
---    name = 'Attach to gdbserver :1234',
---    type = 'cppdbg',
---    request = 'launch',
---    MIMode = 'gdb',
---    miDebuggerServerAddress = 'localhost:1234',
---    miDebuggerPath = '/usr/bin/gdb',
---    cwd = '${workspaceFolder}',
---    program = function()
---      return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
---    end,
---  },
-}
-require("dapui").setup()
-EOF
-
-lua <<EOF
-    local function set_keymap(...) vim.api.nvim_set_keymap(...) end
-
-    local opts = { noremap=true, silent=true }
-    set_keymap("n", "<F2>", ":lua require('dapui').toggle()<CR>", opts)
-
-    set_keymap("n", "<F5>", ":lua require('dap').continue()<CR>", opts)
-    set_keymap("n", "<F3>", ":lua require('dap').terminate()<CR>", opts)
-
-    set_keymap("n", "<F9>", ":lua require('dap').toggle_breakpoint()<CR>", opts)
-
-    set_keymap("n", "<F10>", ":lua require('dap').step_over()<CR>", opts)
-    set_keymap("n", "<F11>", ":lua require('dap').step_into()<CR>", opts)
-    set_keymap("n", "<F12>", ":lua require('dap').step_out()<CR>", opts)
-
-    set_keymap("n", "<Leader>dsc", ":lua require('dap').continue()<CR>", opts)
-    set_keymap("n", "<Leader>dsv", ":lua require('dap').step_over()<CR>", opts)
-    set_keymap("n", "<Leader>dsi", ":lua require('dap').step_into()<CR>", opts)
-    set_keymap("n", "<Leader>dso", ":lua require('dap').step_out()<CR>", opts)
-
-    set_keymap("n", "<Leader>dk", ":lua require('dap').up()<CR>", opts)
-    set_keymap("n", "<Leader>dj", ":lua require('dap').down()<CR>", opts)
-
-    set_keymap("n", "<Leader>dhh", ":lua require('dap.ui.variables').hover()<CR>", opts)
-    set_keymap("v", "<Leader>dhv", ":lua require('dap.ui.variables').visual_hover()<CR>", opts)
-
-    set_keymap("n", "<Leader>duh", ":lua require('dap.ui.widgets').hover()<CR>", opts)
-    set_keymap("n", "<Leader>duf", ":lua local widgets=require('dap.ui.widgets');widgets.centered_float(widgets.scopes)<CR>", opts)
-
-    set_keymap("n", "<Leader>dro", ":lua require('dap').repl.open()<CR>", opts)
-    set_keymap("n", "<Leader>drl", ":lua require('dap').repl.run_last()<CR>", opts)
-
-    set_keymap("n", "<Leader>dbc", ":lua require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>", opts)
-    set_keymap("n", "<Leader>dbm", ":lua require('dap').set_breakpoint({ nil, nil, vim.fn.input('Log point message: ') })<CR>", opts)
-    set_keymap("n", "<Leader>dtb", ":lua require('dap').toggle_breakpoint()<CR>", opts)
-
-    set_keymap("n", "<Leader>dc", ":lua require('dap.ui.variables').scopes()<CR>", opts)
-    set_keymap("n", "<Leader>di", ":lua require('dapui').toggle()<CR>", opts)
 
 EOF
 
@@ -744,3 +556,4 @@ require"octo".setup({
   }
 })
 EOF
+
