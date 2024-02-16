@@ -212,7 +212,7 @@ lua <<EOF
   -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
   require'lspconfig'.clangd.setup{ 
     on_attach = on_attach,
-    cmd = {"clangd-12", "--background-index", "--clang-tidy"}
+    cmd = {"clangd-15", "--background-index", "--clang-tidy"}
   }
   require'lspconfig'.pylsp.setup{}
   require'lspconfig'.mlir_lsp_server.setup{

@@ -1,0 +1,68 @@
+{
+    "version": 4,
+    "include": [
+        "CMakePresets.json"
+    ],
+    "configurePresets": [
+        {
+            "name": "BuildClang",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": {
+                    "type": "STRING",
+                    "value": "clang-15"
+                },
+                "CMAKE_CXX_COMPILER": {
+                    "type": "STRING",
+                    "value": "clang++-15"
+                },
+                "ENABLE_CLANG_FORMAT": false
+            }
+        },
+        {
+            "name": "BuildRelWithDebInfo",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build-x86_64/RelWithDebInfo",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": {
+                    "type": "STRING",
+                    "value": "RelWithDebInfo"
+                },
+                "InferenceEngineDeveloperPackage_DIR": {
+                    "type": "FILEPATH",
+                    "value": "$env{OPENVINO_HOME}/build-x86_64/RelWithDebInfo"
+                }
+            }
+        },
+        {
+            "name": "vpuxDeveloperClangMold",
+            "displayName": "vpuxDeveloperClangMold",
+            "inherits": ["BuildRelWithDebInfo", "vpuxDeveloper", "LinkerOptimization", "BuildClang", "NinjaClangColors"]
+        },
+        {
+            "name": "vpuxReleaseClangMold",
+            "displayName": "vpuxReleaseClangMold",
+            "inherits": ["vpuxRelease", "LinkerOptimization", "BuildClang", "NinjaClangColors"]
+        },
+        {
+            "name": "ovVpuxDeveloperMold",
+            "displayName": "ovVpuxDeveloperMold",
+            "inherits": ["ovVpuxDeveloper", "LinkerOptimization", "NinjaClangColors", "BuildRelWithDebInfo"]
+        },
+        {
+            "name": "ovVpuxReleaseMold",
+            "displayName": "ovVpuxReleaseMold",
+            "inherits": ["ovVpuxRelease", "LinkerOptimization", "NinjaClangColors"]
+        },
+        {
+            "name": "ovVpuxDeveloperClangMold",
+            "displayName": "ovVpuxDeveloperClangMold",
+            "inherits": ["BuildRelWithDebInfo", "BuildClang", "ovVpuxDeveloper", "LinkerOptimization", "NinjaClangColors"]
+        },
+        {
+            "name": "ovVpuxReleaseClangMold",
+            "displayName": "ovVpuxReleaseClangMold",
+            "inherits": ["BuildClang", "ovVpuxRelease", "LinkerOptimization", "NinjaClangColors"]
+        }
+    ]
+}
