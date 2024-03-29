@@ -35,5 +35,7 @@ return {
   'vim-airline/vim-airline',
   'ThePrimeagen/harpoon',
   'nvim-tree/nvim-web-devicons',
-  'pwntester/octo.nvim'
+  'pwntester/octo.nvim',
+  'github/copilot.vim',
+  'nvim-neotest/nvim-nio'
 }

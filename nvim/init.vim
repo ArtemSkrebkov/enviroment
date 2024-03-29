@@ -85,7 +85,7 @@ filetype plugin indent on
 lua << EOF
     require'nvim-treesitter.configs'.setup {
       -- A list of parser names, or "all"
-      ensure_installed = { "c", "cpp", "rust" },
+      ensure_installed = { "c", "cpp", "rust", "lua", "vim", "vimdoc", "query" },
 
       -- Install parsers synchronously (only applied to `ensure_installed`)
       sync_install = false,
@@ -212,16 +212,16 @@ lua <<EOF
   -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
   require'lspconfig'.clangd.setup{ 
     on_attach = on_attach,
-    cmd = {"clangd-15", "--background-index", "--clang-tidy"}
+    cmd = {"clangd-15", "--background-index", "--clang-tidy", "--offset-encoding=utf-16"}
   }
   require'lspconfig'.pylsp.setup{}
   require'lspconfig'.mlir_lsp_server.setup{
     on_attach = on_attach,
-    cmd = {vim.fn.getcwd() .. "/../../ov/release/bin/intel64/Debug/vpux-lsp-server", "--vpu-arch=VPUX37XX"}
+    cmd = {vim.fn.getcwd() .. "/../../ov/release/bin/intel64/RelWithDebInfo/vpux-lsp-server", "--vpu-arch=VPUX37XX"}
   }
   require'lspconfig'.tblgen_lsp_server.setup{
     on_attach = on_attach,
-    cmd = {vim.fn.getcwd() .. "/build-x86_64/Debug/thirdparty/llvm-project/llvm/bin/tblgen-lsp-server",
+    cmd = {vim.fn.getcwd() .. "/build-x86_64/RelWithDebnfo/thirdparty/llvm-project/llvm/bin/tblgen-lsp-server",
             "--tablegen-compilation-database=tablegen_compile_commands.yml"
             }
   }
@@ -421,7 +421,7 @@ require"octo".setup({
       field = "CREATED_AT",                -- either COMMENTS, CREATED_AT or UPDATED_AT (https://docs.github.com/en/graphql/reference/enums#issueorderfield)
       direction = "DESC"                   -- either DESC or ASC (https://docs.github.com/en/graphql/reference/enums#orderdirection)
     },
-    always_select_remote_on_create = "false" -- always give prompt to select base remote repo when creating PRs
+    always_select_remote_on_create = false -- always give prompt to select base remote repo when creating PRs
   },
   file_panel = {
     size = 10,                             -- changed files panel rows
