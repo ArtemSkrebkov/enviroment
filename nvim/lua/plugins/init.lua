@@ -10,7 +10,6 @@ return {
   'rhysd/vim-clang-format',
   'skywind3000/asyncrun.vim',
   'rhysd/vim-llvm',
-  'iamcco/markdown-preview.nvim',
   'kamykn/spelunker.vim',
   'dbeniamine/cheat.sh-vim',
   'neovim/nvim-lspconfig',
@@ -37,5 +36,6 @@ return {
   'nvim-tree/nvim-web-devicons',
   'pwntester/octo.nvim',
   'github/copilot.vim',
-  'nvim-neotest/nvim-nio'
+  'nvim-neotest/nvim-nio',
+  {'akinsho/toggleterm.nvim', version = "*", config = true}
 }

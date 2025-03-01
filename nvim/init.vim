@@ -83,6 +83,7 @@ filetype plugin indent on
 
 " treesitter setup
 lua << EOF
+    require("nvim-treesitter.install").prefer_git = true
     require'nvim-treesitter.configs'.setup {
       -- A list of parser names, or "all"
       ensure_installed = { "c", "cpp", "rust", "lua", "vim", "vimdoc", "query" },
@@ -212,19 +213,19 @@ lua <<EOF
   -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
   require'lspconfig'.clangd.setup{ 
     on_attach = on_attach,
-    cmd = {"clangd-15", "--background-index", "--clang-tidy", "--offset-encoding=utf-16"}
+    cmd = {"clangd-18", "--background-index", "--clang-tidy", "--offset-encoding=utf-16"}
   }
   require'lspconfig'.pylsp.setup{}
-  require'lspconfig'.mlir_lsp_server.setup{
-    on_attach = on_attach,
-    cmd = {vim.fn.getcwd() .. "/../../ov/release/bin/intel64/RelWithDebInfo/vpux-lsp-server", "--vpu-arch=VPUX37XX"}
-  }
-  require'lspconfig'.tblgen_lsp_server.setup{
-    on_attach = on_attach,
-    cmd = {vim.fn.getcwd() .. "/build-x86_64/RelWithDebnfo/thirdparty/llvm-project/llvm/bin/tblgen-lsp-server",
-            "--tablegen-compilation-database=tablegen_compile_commands.yml"
-            }
-  }
+  -- require'lspconfig'.mlir_lsp_server.setup{
+  --  on_attach = on_attach,
+  --  cmd = {vim.fn.getcwd() .. "/../../ov/release/bin/intel64/RelWithDebInfo/vpux-lsp-server", "--vpu-arch=NPU40XX"}
+  -- }
+  -- require'lspconfig'.tblgen_lsp_server.setup{
+  --   on_attach = on_attach,
+  --  cmd = {vim.fn.getcwd() .. "/build-x86_64/RelWithDebnfo/thirdparty/llvm-project/llvm/bin/tblgen-lsp-server",
+  --          "--tablegen-compilation-database=tablegen_compile_commands.yml"
+  --          }
+  -- }
 EOF
 
 lua <<EOF
