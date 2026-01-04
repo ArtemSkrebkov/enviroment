@@ -30,12 +30,32 @@ return {
   'aklt/plantuml-syntax',
   'tyru/open-browser.vim',
   'weirongxu/plantuml-previewer.vim',
-  'ThePrimeagen/git-worktree.nvim',
   'vim-airline/vim-airline',
-  'ThePrimeagen/harpoon',
   'nvim-tree/nvim-web-devicons',
   'pwntester/octo.nvim',
   'github/copilot.vim',
   'nvim-neotest/nvim-nio',
-  {'akinsho/toggleterm.nvim', version = "*", config = true}
+  {'akinsho/toggleterm.nvim', version = "*", config = true},
+  {
+    "ThePrimeagen/harpoon",
+    branch = "harpoon2",
+    dependencies = { "nvim-lua/plenary.nvim" }
+  },
+  {
+    'polarmutex/git-worktree.nvim',
+    version = '^2',
+    dependencies = { "nvim-lua/plenary.nvim" }
+  },
+  {
+    "CopilotC-Nvim/CopilotChat.nvim",
+    dependencies = {
+      { "github/copilot.vim" }, -- or zbirenbaum/copilot.lua
+      { "nvim-lua/plenary.nvim", branch = "master" }, -- for curl, log and async functions
+    },
+    build = "make tiktoken", -- Only on MacOS or Linux
+    opts = {
+      -- See Configuration section for options
+    },
+    -- See Commands section for default commands if you want to lazy load on them
+  },
 }

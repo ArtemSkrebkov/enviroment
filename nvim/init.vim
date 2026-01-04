@@ -94,6 +94,11 @@ lua << EOF
       highlight = {
         -- `false` will disable the whole extension
         enable = true,
+        disable = function(lang, buf)
+          local max_filesize = 100 * 1024 -- 100 KB
+          local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+          return ok and stats and stats.size > max_filesize
+        end,
 
         -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
         -- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
@@ -106,6 +111,9 @@ lua << EOF
         -- Using this option may slow down your editor, and you may see some duplicate highlights.
         -- Instead of true it can also be a list of languages
         additional_vim_regex_highlighting = false,
+      },
+      indent = {
+        enable = false,
       },
     }
 EOF
@@ -190,8 +198,8 @@ lua <<EOF
       buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
       buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
       buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-      buf_set_keymap('n', '<space>r', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-      buf_set_keymap('n', '<space>a', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+      buf_set_keymap('n', '<C-R>', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+      buf_set_keymap('n', '<C-a>', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
       buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
       buf_set_keymap('n', '<space>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
       buf_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
@@ -215,6 +223,7 @@ lua <<EOF
     on_attach = on_attach,
     cmd = {"clangd-18", "--background-index", "--clang-tidy", "--offset-encoding=utf-16"}
   }
+  vim.lsp.set_log_level("off")
   require'lspconfig'.pylsp.setup{}
   -- require'lspconfig'.mlir_lsp_server.setup{
   --  on_attach = on_attach,
@@ -282,64 +291,22 @@ local opts = {
 EOF
 
 lua <<EOF
-    require("git-worktree").setup() 
     require("telescope").load_extension("git_worktree")
-    local Worktree = require("git-worktree")
-    local Job = require("plenary.job")
-    local Path = require("plenary.path")
 
-    Worktree.on_tree_change(function(op, metadata)
-            if op == Worktree.Operations.Switch then
-                print("Switched from " .. metadata.prev_path .. " to " .. metadata.path)
-            end
+    local Hooks = require("git-worktree.hooks")
+    local config = require('git-worktree.config')
+    local update_on_switch = Hooks.builtins.update_current_buffer_on_switch
 
-            if op == Worktree.Operations.Create then
-                print("Create worktree " .. metadata.path)
-                -- If we're dealing with create, the path is relative to the worktree and not absolute
-                -- so we need to convert it to an absolute path.
-                local new_path = metadata.path
-                if not Path:new(new_path):is_absolute() then
-                    new_path = Path:new():absolute()
-                    if new_path:sub(-#'/') == '/' then
-                        new_path = string.sub(new_path, 1, string.len(new_path) - 1)
-                    end
-                end
-                if not Path:new("/home/askrebko/workspace/repos/ov/release/modules/vpux"):exists() then
-                    Job:new({
-                        "git", "clone", "--recursive-submodule", "--jobs", "8",
-                        "https://github.com/intel-innersource/applications.ai.vpu-accelerators.vpux-plugin.git",
-                        "/home/askrebko/workspace/repos/ov/release/modules/vpux"
-                    }):start()
-                    print("Cloned vpux module ...")
-                end
-            end
-
-            if op == Worktree.Operations.Delete then
-                print("Delete worktree " .. metadata.path)
-            end
-        --if op == Worktree.Operations.Switch then
-        --    Job:new({
-        --        "git", "submodule", "update", "--init", "--recursive", "--jobs", "8"
-        --    }):start()
-        --    print("Updated submodules...")
-        --elseif op == Worktree.Operations.Create then
-        --    if not Path:new("/home/askrebko/workspace/repos/ov/release/modules/vpux"):exists() then
-        --        Job:new({
-        --            "git", "clone", "--recursive-submodule", "--jobs", "8",
-        --            "https://github.com/intel-innersource/applications.ai.vpu-accelerators.vpux-plugin.git",
-        --            "/home/askrebko/workspace/repos/ov/release/modules/vpux"
-        --        }):start()
-        --        print("Cloned vpux module ...")
-        --    else 
-        --        print("vpux module exists...")
-        --    end
-        --end
+    Hooks.register(Hooks.type.SWITCH, function (path, prev_path)
+        vim.notify("Moved from " .. prev_path .. " to " .. path)
+        update_on_switch(path, prev_path)
     end)
+
+    Hooks.register(Hooks.type.DELETE, function ()
+        vim.cmd(config.update_on_change_command)
+    end)
+    vim.keymap.set('n', '<leader>gws', function() require('telescope').extensions.git_worktree.git_worktree() end, { desc = "Open git worktrees" })
 EOF
-
-nnoremap <leader>gws :Telescope git_worktree git_worktrees<CR>
-nnoremap <leader>gwc :Telescope git_worktree create_git_worktree<CR>
-
 
 " air-line
 let g:airline_powerline_fonts = 1
@@ -544,3 +511,44 @@ require"octo".setup({
 })
 EOF
 
+lua <<EOF
+local harpoon = require("harpoon")
+
+-- REQUIRED
+harpoon:setup()
+-- REQUIRED
+
+vim.keymap.set("n", "<leader>a", function() harpoon:list():add() end)
+vim.keymap.set("n", "<C-e>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
+
+vim.keymap.set("n", "<leader>1", function() harpoon:list():select(1) end)
+vim.keymap.set("n", "<leader>2", function() harpoon:list():select(2) end)
+vim.keymap.set("n", "<leader>3", function() harpoon:list():select(3) end)
+vim.keymap.set("n", "<leader>4", function() harpoon:list():select(4) end)
+
+-- Toggle previous & next buffers stored within Harpoon list
+vim.keymap.set("n", "<leader>p", function() harpoon:list():prev() end)
+vim.keymap.set("n", "<leader>n", function() harpoon:list():next() end)
+EOF
+
+lua << EOF
+
+require("CopilotChat").setup {
+  -- debug = true, -- Enable debugging
+  -- See Configuration section for rest
+  mappings = {
+    complete = {
+      detail = 'Use @<Tab> or /<Tab> for options.',
+      insert ='<S-Tab>',
+    }
+  }
+}
+EOF
+
+lua << EOF
+vim.keymap.set('i', '<C-J>', 'copilot#Accept("\\<CR>")', {
+  expr = true,
+  replace_keycodes = false
+})
+vim.g.copilot_no_tab_map = true
+EOF
