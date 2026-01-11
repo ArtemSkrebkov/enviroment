@@ -32,6 +32,19 @@
                 "ENABLE_DEBUG_CAPS": true,
                 "ENABLE_SANITIZER": true
             }
+        },
+        {
+            "name": "user-win-vpux-relwithdebinfo",
+            "displayName": "user-win-vpux-relwithdebinfo",
+            "inherits": ["developer-build-relwithdebinfo"]
+        },
+        {
+            "name": "user-win-ov-relwithdebinfo",
+            "displayName": "user-win-ov-relwithdebinfo",
+            "inherits": ["developer-build-relwithdebinfo"],
+            "cacheVariables": {
+                "ENABLE_DEBUG_CAPS": true
+            }
         }
     ]
 }
