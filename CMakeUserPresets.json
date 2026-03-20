@@ -5,16 +5,16 @@
     ],
     "configurePresets": [
         {
-            "name": "build-clang-18",
+            "name": "build-clang-20",
             "hidden": true,
             "cacheVariables": {
                 "CMAKE_C_COMPILER": {
                     "type": "STRING",
-                    "value": "clang-18"
+                    "value": "clang-20"
                 },
                 "CMAKE_CXX_COMPILER": {
                     "type": "STRING",
-                    "value": "clang++-18"
+                    "value": "clang++-20"
                 },
                 "ENABLE_CLANG_FORMAT": false
             }
@@ -22,12 +22,12 @@
         {
             "name": "user-vpux-relwithdebinfo",
             "displayName": "user-vpux-relwithdebinfo",
-            "inherits": ["build-clang-18", "developer-build-fast-relwithdebinfo"]
+            "inherits": ["build-clang-20", "developer-build-fast-relwithdebinfo"]
         },
         {
             "name": "user-ov-relwithdebinfo",
             "displayName": "user-ov-relwithdebinfo",
-            "inherits": ["build-clang-18", "developer-build-fast-relwithdebinfo"],
+            "inherits": ["build-clang-20", "developer-build-fast-relwithdebinfo"],
             "cacheVariables": {
                 "ENABLE_DEBUG_CAPS": true,
                 "ENABLE_SANITIZER": true

@@ -221,7 +221,7 @@ lua <<EOF
   -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
   require'lspconfig'.clangd.setup{ 
     on_attach = on_attach,
-    cmd = {"clangd-18", "--background-index", "--clang-tidy", "--offset-encoding=utf-16"}
+    cmd = {"clangd-20", "--background-index", "--clang-tidy", "--offset-encoding=utf-16"}
   }
   vim.lsp.set_log_level("off")
   require'lspconfig'.pylsp.setup{}
